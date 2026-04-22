@@ -1,0 +1,27 @@
+# meta/project.yaml
+# 项目元信息 — 每次会话始终加载（<200 tokens）
+# 填写说明：只填代码中读不出来的信息；构建命令、平台等 Agent 无法自行判断的内容
+
+project:
+  name: "YOUR_PROJECT_NAME"
+  description: "一句话描述项目是什么"
+  platform: "android"          # android | ios | web | backend | cross-platform
+  language: "kotlin"           # 主要语言
+  min_sdk: 21                  # 仅 Android/iOS 填写
+
+build:
+  compile: "./gradlew assembleDebug"    # 编译命令
+  test: "./gradlew test"                # 测试命令
+  lint: "./gradlew lint"                # Lint 命令
+  # 特殊说明（可选）：如"必须用 ./rb 而不是 gradle"
+
+architecture:
+  pattern: "MVVM"              # 整体架构模式
+  di_framework: "手动 IOC"     # 依赖注入框架（如 Hilt / Koin / 无）
+  notes: |
+    填写架构中 Agent 可能误判的特殊点。
+    例如："不使用 Jetpack Navigation，用自研路由 XXRouter"
+
+team:
+  owners: ["dev-a", "dev-b"]   # 项目负责人（可选）
+  kb_repo: ""                  # 知识库仓库地址（如有独立仓库）

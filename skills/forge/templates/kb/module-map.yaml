@@ -1,0 +1,27 @@
+# meta/module-map.yaml
+# 模块映射表 — 供 module-resolver 和变更传播使用
+#
+# 维护原则：
+#   - paths 只填可以唯一定位模块的路径 glob，不要过宽（避免误匹配）
+#   - kb_files 填该模块实际存在的知识库文件路径
+#   - 新增模块时顺带更新这个文件
+
+modules:
+  # 示例条目：
+  # feed-square:
+  #   paths:
+  #     - "**/feedsquare/**"
+  #     - "**/feed/square/**"
+  #   description: "频道主页帖子广场"
+  #   owners: ["dev-a"]
+  #   kb_files:
+  #     - "modules/feed-square/index.md"
+  #     - "modules/feed-square/tab-system.md"
+
+  example-module:
+    paths:
+      - "**/example/**"
+    description: "示例模块 — 请替换为真实模块"
+    owners: []
+    kb_files:
+      - "modules/example-module/index.md"

@@ -1,0 +1,27 @@
+# meta/glossary.yaml
+# 术语表 — 每次会话始终加载
+# 这是知识库中价值密度最高的文件：几百 tokens 干掉 80% AI 幻觉
+#
+# 维护原则：
+#   - 只记录产品术语与代码命名不一致的映射
+#   - 记录已废弃的旧命名（防止 Agent 用错）
+#   - 不记录命名一致的类（Agent 直接 Grep 即可）
+#
+# 冷启动方法：团队头脑风暴"你们的黑话有哪些"，每人贡献 10 条，去重合并，1-2h 搞定
+
+terms:
+  # 示例条目：
+  # - product_name: "在线状态"
+  #   code_names: ["OnlineStatusManager", "OnlineStatusView"]
+  #   module: "online-status"
+  #   notes: "不要和 UserStatus 混淆，那是账号状态"
+
+  # - product_name: "小世界"
+  #   code_names: ["MiniWorldFragment", "MiniWorldService"]
+  #   module: "mini-world"
+  #   notes: "早期代码里叫 SmallWorld，已废弃"
+
+  - product_name: "REPLACE_ME"
+    code_names: ["ReplaceWithCodeClassName"]
+    module: "replace-with-module-name"
+    notes: "删掉这条示例，填入真实术语"
