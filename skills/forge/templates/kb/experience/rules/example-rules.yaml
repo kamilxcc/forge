@@ -1,0 +1,73 @@
+# experience/rules 示例
+#
+# 每个 YAML 文件对应一个分类（如 network-rules.yaml / ui-rules.yaml / arch-rules.yaml）
+# 由 /deposit 自动追加，或人工编写。
+#
+# 字段说明：
+#   id         — 唯一标识，建议格式 <module>-<number>
+#   type       — risk（踩坑/禁止）| pattern（推荐做法）| context（背景知识）
+#   level      — critical / warn / info
+#   module     — 所属模块名（与 module-map.yaml 一致）
+#   keywords   — 关键词列表，供 kb-load.sh 做匹配过滤
+#   alert      — 一句话摘要（供 Agent 快速判断是否相关）
+#   body       — 详细说明（可多行）
+#   source     — 来源（pr/<id> | human | auto）
+#   created_by — 创建者标识
+#   created_at — 创建日期
+
+rules:
+
+  - id: channel-001
+    type: risk
+    level: critical
+    module: channel
+    keywords: [ChannelManager, init, Application]
+    alert: "ChannelManager.init() 必须在 Application.onCreate() 最早调用"
+    body: |
+      晚于 ContentProvider 初始化则会触发 NPE crash，因为 ContentProvider
+      可能在 Application.onCreate() 前触发（如 Jetpack Startup）。
+      正确做法：在 BaseApplication.onCreate() 第一行调用。
+    source: pr/1234
+    created_by: auto
+    created_at: 2024-12-10
+
+  - id: channel-002
+    type: risk
+    level: warn
+    module: channel
+    keywords: [ChannelRepository, DAO, cache]
+    alert: "不要绕过 ChannelManager 直接操作 ChannelRepository DAO"
+    body: |
+      直接调用 DAO 会绕过内存缓存层，导致 ChannelViewModel 的 LiveData
+      观察者收不到更新。所有写操作必须通过 ChannelManager 门面方法。
+    source: human
+    created_by: kamilxiao
+    created_at: 2024-11-20
+
+  - id: network-001
+    type: pattern
+    level: info
+    module: network
+    keywords: [retry, timeout, OkHttp]
+    alert: "重试逻辑统一走 RetryInterceptor，不要在业务层手写 retry"
+    body: |
+      项目统一使用 RetryInterceptor（最多 3 次，指数退避）。
+      业务层如果额外加重试，会导致实际重试次数 = 业务次数 × 3，放大后端压力。
+      特殊需求（如上传接口不重试）用 Request.tag(NoRetry::class.java) 标记。
+    source: human
+    created_by: kamilxiao
+    created_at: 2025-01-05
+
+  - id: ui-001
+    type: context
+    level: info
+    module: feed
+    keywords: [RecyclerView, FeedList, ViewHolder, screen width]
+    alert: "FeedList 的 ViewHolder 宽度用 match_parent，不要硬编码屏幕宽度"
+    body: |
+      FeedList 会在折叠屏和平板上以多列模式运行（column_count 由后台下发）。
+      硬编码屏幕宽度会导致在这些设备上 item 溢出或留白。
+      使用 ConstraintLayout + 0dp 约束或 match_parent 代替。
+    source: human
+    created_by: kamilxiao
+    created_at: 2025-01-08
