@@ -8,33 +8,11 @@
 
 ## 安装
 
-### 1. 将插件加入 Claude Code
-
-在 `~/.claude/settings.json`（全局）或目标项目的 `.claude/settings.json`（项目级）中添加所有 skill 目录：
-
-```json
-{
-  "skills": [
-    "/path/to/forge-plugin/skills/forge",
-    "/path/to/forge-plugin/skills/forge-clarify",
-    "/path/to/forge-plugin/skills/forge-plan",
-    "/path/to/forge-plugin/skills/forge-implement",
-    "/path/to/forge-plugin/skills/forge-review",
-    "/path/to/forge-plugin/skills/forge-test",
-    "/path/to/forge-plugin/skills/forge-kb"
-  ]
-}
-```
-
-### 2. 初始化目标项目的知识库
-
-在目标项目根目录运行：
+在项目目录下启动 Claude Code 时，通过 `--plugin-dir` 指定本地插件路径：
 
 ```bash
-bash /path/to/forge-plugin/scripts/init-kb.sh
+claude --plugin-dir /Users/kamilxiao/code/forge-plugin
 ```
-
-按照生成文件中的注释填充最小存活集（`project.yaml`、`glossary.yaml`、`module-map.yaml`）。
 
 ---
 
