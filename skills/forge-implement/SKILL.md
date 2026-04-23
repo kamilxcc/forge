@@ -95,35 +95,43 @@ plugin_root: <plugin-root>
 执行规范详见 <plugin-root>/agents/forge-executor.md，按其中的流程逐步执行。
 ```
 
+派发子 Agent 前，先输出以下提示，让用户知道如何追踪进度：
+
+```
+🚀 已启动 Agent 模式执行（共 N 步）。
+
+执行进度实时显示在 Claude Code 左侧的任务面板（Todo list）中，
+每步开始时标为进行中，完成后标为已完成。
+完成后我会在此展示汇总结果。
+```
+
 子 Agent 完成后，主 session 展示其汇总结果，并提示用户运行 `/review`。
 
 **当前会话模式**：直接进入第 4 步。在 inline 模式下，你的执行逻辑应当与 forge-executor.md 的执行规范一致，但直接在本 session 中执行，避免上下文切换的开销。参考第 4 步的执行框架。
 
-### 第 4 步：展示执行计划总览（inline 模式）
+### 第 4 步：初始化任务列表（inline 模式）
 
-读取 task.md 中的步骤列表，在开始执行前**一次性输出所有步骤及初始状态**：
+读取 task.md 中的步骤列表，调用 `TodoWrite` 把所有步骤写入任务列表，状态全部设为 `pending`：
 
 ```
-📋 执行计划（共 N 步）：
-
-⬜ Step 1: <标题>
-⬜ Step 2: <标题>
-⬜ Step 3: <标题>
-...
-
-开始执行 👇
+TodoWrite([
+  { id: "step-1", content: "Step 1: <标题>", status: "pending", priority: "high" },
+  { id: "step-2", content: "Step 2: <标题>", status: "pending", priority: "high" },
+  ...
+])
 ```
+
+用户在 Claude Code 任务面板里能实时看到执行进度。
 
 ### 第 4.5 步：逐步执行（inline 模式）
 
 对每个步骤，遵循以下节奏：
 
-1. **理解步骤**：Read step description 和相关文件，理解需要做什么
-2. **执行改动**：使用 Write/Edit/Bash 等工具执行改动
-3. **验证**：执行相关的语法检查或编译验证（如 `kotlinc -nowarn` 快速检查）
-4. **输出摘要**：按 `<plugin-root>/references/structured-step-output.md` 格式输出每步完成摘要
-
-每步完成后，更新步骤列表中的状态（⬜ → ✅）。
+1. **开始前**：调用 `TodoWrite` 将当前步骤状态改为 `in_progress`
+2. **理解步骤**：Read step description 和相关文件，理解需要做什么
+3. **执行改动**：使用 Write/Edit/Bash 等工具执行改动
+4. **验证**：执行相关的语法检查或编译验证（如 `kotlinc -nowarn` 快速检查）
+5. **完成后**：调用 `TodoWrite` 将当前步骤状态改为 `completed`，再输出步骤摘要
 
 ### 第 5 步：汇总与下一步建议
 

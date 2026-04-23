@@ -51,27 +51,26 @@ Read `task_path` 和 `plan_path`，提取：
 - 每步涉及的文件和改动目标
 - 风险点和依赖
 
-### 第 3 步：展示执行计划总览
+### 第 3 步：用 TodoWrite 初始化任务列表
 
-在开始执行前**一次性输出所有步骤及初始状态**：
+在开始执行前，调用 `TodoWrite` 把所有步骤写入任务列表，状态全部设为 `pending`：
 
 ```
-📋 执行计划（共 N 步）：
-
-⬜ Step 1: <标题>
-⬜ Step 2: <标题>
-⬜ Step 3: <标题>
-...
-
-开始执行 👇
+TodoWrite([
+  { id: "step-1", content: "Step 1: <标题>", status: "pending", priority: "high" },
+  { id: "step-2", content: "Step 2: <标题>", status: "pending", priority: "high" },
+  ...
+])
 ```
+
+这样用户在 Claude Code UI 的任务面板里能实时看到所有步骤及其完成状态。
 
 ### 第 4 步：逐步执行
 
 **按计划步骤顺序执行，不可跳步，不可合并步骤**。
 
 每步执行前：
-1. 宣告「开始执行 Step N：<标题>」
+1. 调用 `TodoWrite` 将当前步骤状态从 `pending` 改为 `in_progress`
 2. Read 所有涉及文件（不依赖记忆）
 3. 检查该步骤是否会触碰 KB 中的 CRITICAL 规则，若有，先说明处理方式
 4. **Scope Guard**：对比本步骤即将修改的文件与 task.md 中该步骤声明的文件列表：
@@ -88,17 +87,9 @@ Read `task_path` 和 `plan_path`，提取：
    - 继续执行（小调整）或在汇总中标记（大偏差，无法交互）
 
 每步执行后：
-1. 按 `<plugin_root>/references/structured-step-output.md` 输出 Step N 摘要
-2. 将 task.md 中对应步骤的 `- [ ]` 改为 `- [x]`
-3. 重新输出完整步骤列表，更新状态：
-
-```
-✅ Step 1: <标题>
-✅ Step 2: <标题>
-🔄 Step 3: <标题>（执行中）
-⬜ Step 4: <标题>
-...
-```
+1. 调用 `TodoWrite` 将当前步骤状态改为 `completed`（**这是用户在 UI 里看到的实时进度**）
+2. 按 `<plugin_root>/references/structured-step-output.md` 输出 Step N 摘要
+3. 将 task.md 中对应步骤的 `- [ ]` 改为 `- [x]`（持久化到文件，供事后查阅）
 
 ### 第 5 步：输出汇总并询问下一步
 
