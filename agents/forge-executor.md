@@ -71,7 +71,7 @@ TodoWrite([
 
 每步执行前：
 1. 调用 `TodoWrite` 将当前步骤状态从 `pending` 改为 `in_progress`
-2. Read 所有涉及文件（不依赖记忆）
+2. Read task.md 中本步骤声明的文件路径，**不做额外 Glob/Grep**（task.md 已由 /plan 定位好文件）
 3. 检查该步骤是否会触碰 KB 中的 CRITICAL 规则，若有，先说明处理方式
 4. **Scope Guard**：对比本步骤即将修改的文件与 task.md 中该步骤声明的文件列表：
    - 若完全一致 → 继续执行
