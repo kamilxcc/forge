@@ -83,6 +83,5 @@ bash <plugin-root>/scripts/kb-load.sh \
 | /implement 执行计划 | always + task |
 | /review 代码审查 | always + task |
 | /test 写测试 | always + task |
-| /deposit 经验沉淀 | always（task 可选）|
 | /onboard 模块了解 | always + task（指定模块）|
 | /init-kb 初始化 | 不加载（KB 不存在）|

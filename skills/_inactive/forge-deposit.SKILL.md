@@ -73,37 +73,26 @@ Read .forge-kb/.state/modified-files.txt
 
 将识别到的经验信号整理成 YAML 格式的候选条目（见模板）。
 
-**一次性展示所有候选条目**，等待用户一键确认：
+**一次性展示所有候选条目**，然后调用 `AskUserQuestion` 等待确认（类型 A，规范见 `<plugin-root>/references/ask-user-question-protocol.md`）：
 
 ```
-📋 从本次修改中发现以下可沉淀的经验，请确认：
+📋 从本次修改中发现以下可沉淀的经验：
 
----
 候选 1（来源：ChannelDispatcher.kt）：
+  id: channel-003 ...
 
-  id: channel-003
-  type: risk
-  level: warn
-  module: channel
-  keywords: [ChannelDispatcher, async, await]
-  alert: "dispatch() 已改为异步，调用方必须 .await()"
-  body: |
-    2024-12 dispatch() 从同步改为异步，返回 Deferred<Boolean>。
-    旧的同步调用会编译失败，需要在协程作用域中 .await()。
-
----
 候选 2（来源：设计决策）：
-
-  id: channel-004
-  type: context
-  level: info
-  ...
-
----
-
-全部确认写入？[全部] [选择] [取消]
-（选择时输入序号，如：1 3）
+  id: channel-004 ...
 ```
+
+然后调用 `AskUserQuestion`：
+
+- `header`：「经验确认」
+- `multiSelect: false`
+- `options`：
+  - `label: 全部写入` / `description: 确认所有候选条目，一次性写入知识库`
+  - `label: 部分写入` / `description: 请在 Other 里输入要保留的序号，如：1 3`
+  - `label: 取消` / `description: 本次不沉淀，跳过写入`
 
 ### 第 5 步：写入知识库
 

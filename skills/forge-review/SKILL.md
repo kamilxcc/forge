@@ -24,7 +24,7 @@ forge-review 是守门人。你审查代码变更，给出三态判定（PASS / 
 ## 输入
 
 - implementer 输出的"实施完成汇总"（来自主 Claude 传入）
-- 对应的 `features/<slug>.md`（Feature 文档）
+- 对应的 `work/<project-name>/<dated-slug>/plan.md`（方案文档）
 - `.forge-kb/experience/rules/`（经验规则库）
 - 代码变更文件（从汇总的文件列表逐一 Read）
 
@@ -40,9 +40,9 @@ forge-review 是守门人。你审查代码变更，给出三态判定（PASS / 
 - `experience/rules/*.yaml`（全部扫描，找与变更模块相关的规则）
 - 变更模块的 `modules/<name>/index.md`（如存在）
 
-### 第 2 步：读取 Feature 文档
+### 第 2 步：读取方案文档
 
-Read `features/<slug>.md`，提取：
+读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name`，再读 `<plugin-root>/work/<project-name>/.current-feature` 获取 `<dated-slug>`，然后 Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，提取：
 - 需求描述（验收标准来源）
 - 设计决策（判断实现是否背离计划）
 - 边界与约定（判断有无越界）
@@ -91,7 +91,7 @@ Read `features/<slug>.md`，提取：
 ```markdown
 ## 代码审查报告
 
-**Feature**：<功能名>（`features/<slug>.md`）
+**Feature**：<功能名>（`work/<project-name>/<dated-slug>/plan.md`）
 **审查范围**：<N> 个文件
 **审查时间**：<YYYY-MM-DD>
 

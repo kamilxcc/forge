@@ -3,7 +3,7 @@ name: forge-test
 description: >
   Forge 测试编写能力。为本次实现的变更生成测试代码并执行确认。
   触发命令：/test。
-  输入：implementer 的实施完成汇总 + Feature 文档。
+  输入：implementer 的实施完成汇总 + 方案文档。
   输出：测试文件 + 测试报告。
 ---
 
@@ -20,7 +20,7 @@ forge-test 负责为本次实现的变更生成测试代码，并执行测试确
 ## 输入
 
 - implementer 输出的"实施完成汇总"（变更文件列表）
-- 对应的 `features/<slug>.md`（Feature 文档，用于提取验收条件）
+- 对应的 `work/<project-name>/<dated-slug>/plan.md`（方案文档，用于提取验收条件）
 - `.forge-kb/` 知识库上下文
 - 项目现有测试文件（用于匹配风格）
 
@@ -51,9 +51,9 @@ Read 1-2 个同模块的测试文件，提取：
 
 **优先模仿现有测试风格，不要引入新的测试依赖。**
 
-### 第 3 步：从 Feature 文档提取测试场景
+### 第 3 步：从方案文档提取测试场景
 
-Read `features/<slug>.md`，从"需求描述"节提取测试矩阵：
+读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name`，再读 `<plugin-root>/work/<project-name>/.current-feature` 获取 `<dated-slug>`，然后 Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，从"实现步骤"和"风险点"节提取测试矩阵：
 
 | 场景 | 输入条件 | 期望行为 | 优先级 |
 |------|---------|---------|-------|

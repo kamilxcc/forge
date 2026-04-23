@@ -2,9 +2,9 @@
 name: forge-plan
 description: >
   Forge 方案设计能力。读取已确认的需求文档，探索代码，生成技术方案文档和执行计划。
-  触发命令：/plan（自动读取 current-requirement.md）或 /plan <需求文档路径>。
-  前置条件：requirements/<slug>.md 已存在（由 /clarify 生成）。
-  输出：features/<slug>.md + .forge-kb/.state/current-task.md。
+  触发命令：/plan（自动读取 .current-feature）或 /plan <需求文档路径>。
+  前置条件：work/<project-name>/YYYY-MM-DD-<slug>/requirement.md 已存在（由 /clarify 生成）。
+  输出：work/<project-name>/YYYY-MM-DD-<slug>/plan.md + task.md。
   完成后停下等待用户确认，不自动开始编码。
 ---
 
@@ -16,7 +16,7 @@ forge-plan 是架构师和规划者。你读取已确认的需求文档，探索
 
 你的产出是一份方案文档和一份执行计划，供用户确认后运行 `/implement` 执行。
 
-**工具边界**：Read / Glob / Grep（只读）+ Write（只写 `features/` 和 `.forge-kb/` 下的文档）
+**工具边界**：Read / Glob / Grep（只读）+ Write（只写 `<plugin-root>/work/` 下的文档）
 
 <HARD-GATE>
 YOU MUST NOT 开始编写任何业务代码。
@@ -28,7 +28,7 @@ forge-plan 的产出只有文档。
 
 ## 输入
 
-- 需求文档（`requirements/<slug>.md`，由 `/clarify` 生成）
+- 需求文档（`work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`，由 `/clarify` 生成）
 - `.forge-kb/` 知识库上下文（按加载协议注入）
 - 代码库（Glob/Grep/Read 自行探索）
 
@@ -44,14 +44,17 @@ forge-plan 的产出只有文档。
 
 按以下优先级查找需求文档：
 
-1. 若用户在命令中指定了路径（`/plan requirements/xxx.md`），直接 Read
-2. 否则，Read `.forge-kb/.state/current-requirement.md`，从 `doc` 字段获取路径
+1. 若用户在命令中指定了路径（`/plan work/.../requirement.md`），直接 Read
+2. 否则：
+   - 读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name` 作为 `<project-name>`
+   - Read `<plugin-root>/work/<project-name>/.current-feature` 获取当前 dated-slug
+   - Read `<plugin-root>/work/<project-name>/<dated-slug>/requirement.md`
 
 若需求文档不存在：
 ```
 ❌ 未找到需求文档。
    请先运行 /clarify <需求描述> 生成需求文档，再运行 /plan。
-   或直接指定：/plan requirements/<slug>.md
+   或直接指定：/plan work/<project-name>/YYYY-MM-DD-<slug>/requirement.md
 ```
 停止执行。
 
@@ -60,6 +63,8 @@ Read 需求文档，提取：
 - 功能边界（做什么 / 不做什么）
 - 涉及模块（探索方向）
 - 与现有功能的冲突/影响（重点关注）
+
+记录当前 `<project-name>` 和 `<dated-slug>` 供后续步骤使用。
 
 ### 第 3 步：代码探索
 
@@ -76,9 +81,9 @@ Read 需求文档，提取：
 
 ### 第 4 步：生成方案文档
 
-按方案文档模板（见下方）生成 `features/<slug>.md`。
+按方案文档模板（见下方）生成 `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`。
 
-slug 与需求文档保持一致（来自 `current-requirement.md` 的 `requirement` 字段）。
+slug 与需求文档保持一致（来自 `.current-feature` 的 dated-slug）。
 
 **设计决策节是重点**：必须记录 why，不只是 what。每个非显而易见的决策都要说明背后的理由。
 
@@ -86,7 +91,7 @@ slug 与需求文档保持一致（来自 `current-requirement.md` 的 `requirem
 
 ### 第 5 步：生成执行计划
 
-写入 `.forge-kb/.state/current-task.md`（见计划模板）。
+写入 `<plugin-root>/work/<project-name>/<dated-slug>/task.md`（见计划模板）。
 
 计划步骤要求：
 - 每步必须是**独立可验证**的（完成后能看到明确结果）
@@ -99,13 +104,14 @@ slug 与需求文档保持一致（来自 `current-requirement.md` 的 `requirem
 
 ### 第 6 步：展示并等待确认
 
-展示方案文档 + 执行计划摘要（步骤列表），**停下来等待用户确认**。
+展示方案文档 + 执行计划摘要（步骤列表）：
 
 ```
-📋 方案设计完成！以下是执行计划，请确认：
+📋 方案设计完成！
 
-[需求文档] requirements/<slug>.md
-[方案文档] features/<slug>.md
+[需求文档] work/<project-name>/<dated-slug>/requirement.md
+[方案文档] work/<project-name>/<dated-slug>/plan.md
+[执行计划] work/<project-name>/<dated-slug>/task.md
 
 **步骤概览**：
 1. <步骤 1>
@@ -114,18 +120,25 @@ slug 与需求文档保持一致（来自 `current-requirement.md` 的 `requirem
 
 **建议执行模式**：--inline（≤3步）或 --agent（>3步）
 **预估风险**：<1-2 条最重要的风险>
-
-确认后输入 `/implement` 开始编码，或告诉我需要调整的地方。
 ```
+
+然后调用 `AskUserQuestion` 等待确认（类型 C，规范见 `<plugin-root>/references/ask-user-question-protocol.md`）：
+
+- `header`：「计划确认」
+- `multiSelect: false`
+- `options`：
+  - `label: 确认，开始编码` / `description: 计划无误，运行 /implement 开始执行`
+  - `label: 需要调整` / `description: 请在 Other 里说明需要修改的地方`
 
 ---
 
-## 方案文档模板
+## 方案文档模板（plan.md）
 
 ```markdown
 ---
 feature: <slug>
-requirement_doc: requirements/<slug>.md
+dated_slug: <dated-slug>
+requirement_doc: requirement.md
 status: confirmed
 created_at: YYYY-MM-DD
 related_modules: [<module1>, <module2>]
@@ -166,13 +179,14 @@ related_modules: [<module1>, <module2>]
 
 ---
 
-## 执行计划模板（.forge-kb/.state/current-task.md）
+## 执行计划模板（task.md）
 
 ```markdown
 ---
 feature: <slug>
-feature_doc: features/<slug>.md
-requirement_doc: requirements/<slug>.md
+dated_slug: <dated-slug>
+plan_doc: plan.md
+requirement_doc: requirement.md
 created_at: YYYY-MM-DD
 status: confirmed
 estimated_steps: N

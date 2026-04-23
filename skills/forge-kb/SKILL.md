@@ -48,23 +48,22 @@ Read `.forge-kb/meta/project.yaml`，然后向用户逐项确认：
 
 ### 第 3 步：引导头脑风暴 glossary.yaml
 
-展示以下提示，帮助用户快速启动：
+展示以下提示，然后调用 `AskUserQuestion`（类型 A，规范见 `<plugin-root>/references/ask-user-question-protocol.md`）：
 
 ```
 现在最重要的一步：填 glossary.yaml（术语表）。
 
 这是整个知识库里 ROI 最高的文件——几百 tokens 消灭 80% AI 幻觉。
-
-启动方法（选一种）：
-A. 你来说黑话，我来填格式。
-   直接说："消息频道叫 ChannelManager，小世界叫 MiniWorldFragment，..."
-   
-B. 你贴一段代码或包名列表，我来推断术语映射。
-
-C. 跳过，先用空的，以后再填。（不推荐，但可以）
-
-你选哪种？
 ```
+
+然后调用 `AskUserQuestion`：
+
+- `header`：「填写方式」
+- `multiSelect: false`
+- `options`：
+  - `label: 直接说黑话` / `description: 你来说术语，我来填格式。如：消息频道叫 ChannelManager，...`
+  - `label: 贴代码或包名` / `description: 你贴一段代码或包名列表，我来推断术语映射`
+  - `label: 跳过` / `description: 先用空的，以后再填（不推荐）`
 
 根据用户输入，向 `.forge-kb/meta/glossary.yaml` 添加条目。
 每添加一批，展示已填内容让用户确认，再继续。
@@ -101,8 +100,6 @@ C. 跳过，先用空的，以后再填。（不推荐，但可以）
 下一步可以：
 - /plan <需求描述> — 开始你的第一个功能
 - /onboard <模块名> — 深入了解某个模块
-
-后续随时可以运行 /deposit 沉淀经验，或 /update-kb 更新模块文档。
 ```
 
 ---
