@@ -1,10 +1,9 @@
 ---
 name: forge-implement
 description: >
-  Forge 编码执行能力。读取已确认的执行计划，逐步完成编码。
-  触发命令：/implement。
+  当已确认的 task.md 存在、用户需要开始编码时触发，例如运行 /implement、"开始编码"、"按计划执行"。
+  读取 task.md + plan.md，按步骤顺序执行，每步完成后输出结构化摘要，全部完成后建议运行 /review。
   前置条件：work/<project-name>/<dated-slug>/task.md 必须存在且 status=confirmed。
-  每步完成后输出结构化摘要，全部完成后建议运行 /review。
 ---
 
 # forge-implement — 编码执行
@@ -13,7 +12,7 @@ description: >
 
 forge-implement 是执行者。你读取已确认的执行计划，逐步完成编码，并在每步完成后输出结构化摘要。
 
-**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）
+**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）+ AskUserQuestion
 
 ---
 
@@ -82,16 +81,32 @@ AskUserQuestion 参数：
   - `label: Agent 模式（推荐）` / `description: 派发子 Agent 执行，上下文隔离，适合步骤多的任务`
   - `label: 当前会话执行` / `description: 在本 session 直接执行，上下文连续但可能变长`
 
-**Agent 模式**：调用 Agent 工具，加载并派发 `<plugin-root>/agents/forge-executor.md`，传入：
+**Agent 模式**：调用 Agent 工具派发 forge-executor。**上下文隔离原则**：子 Agent 不能看到当前会话的历史对话，必须通过 prompt 传入所有它需要的内容。
+
+**构建 Agent prompt 步骤**：
+1. Read `<plugin-root>/work/<project-name>/<dated-slug>/task.md`，将文件完整内容存为 `$TASK_CONTENT`
+2. Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，将文件完整内容存为 `$PLAN_CONTENT`
+3. 将以下完整 prompt 传给 Agent：
+
 ```
-task_path: <plugin-root>/work/<project-name>/<dated-slug>/task.md
-plan_path: <plugin-root>/work/<project-name>/<dated-slug>/plan.md
+你是 forge-executor，按以下执行计划完成编码任务。
+
+=== task.md ===
+$TASK_CONTENT
+
+=== plan.md ===
+$PLAN_CONTENT
+
+=== 路径参数 ===
 kb_path: <target-project-root>/.forge-kb/
 plugin_root: <plugin-root>
+
+执行规范详见 <plugin-root>/agents/forge-executor.md，按其中的流程逐步执行。
 ```
+
 子 Agent 完成后，主 session 展示其汇总结果，并提示用户运行 `/review`。
 
-**当前会话模式**：直接进入第 4 步，由 forge-executor agent 的执行规范指导本 session 执行（参见 `<plugin-root>/agents/forge-executor.md`）。
+**当前会话模式**：直接进入第 4 步。在 inline 模式下，你的执行逻辑应当与 forge-executor.md 的执行规范一致，但直接在本 session 中执行，避免上下文切换的开销。参考第 4 步的执行框架。
 
 ### 第 4 步：展示执行计划总览（inline 模式）
 
@@ -108,9 +123,28 @@ plugin_root: <plugin-root>
 开始执行 👇
 ```
 
-随后按 `<plugin-root>/agents/forge-executor.md` 的执行规范逐步执行，每步完成后刷新状态列表。
+### 第 4.5 步：逐步执行（inline 模式）
 
-所有步骤完成后，输出汇总，然后调用 `AskUserQuestion` 询问下一步：
+对每个步骤，遵循以下节奏：
+
+1. **理解步骤**：Read step description 和相关文件，理解需要做什么
+2. **执行改动**：使用 Write/Edit/Bash 等工具执行改动
+3. **验证**：执行相关的语法检查或编译验证（如 `kotlinc -nowarn` 快速检查）
+4. **输出摘要**：按 `<plugin-root>/references/structured-step-output.md` 格式输出每步完成摘要
+
+每步完成后，更新步骤列表中的状态（⬜ → ✅）。
+
+### 第 5 步：汇总与下一步建议
+
+所有步骤完成后，输出完整汇总（参考 `<plugin-root>/references/structured-step-output.md` 的"所有步骤完成后的汇总格式"）。
+
+汇总中包括：
+- **变更摘要**：所有修改文件的列表和简要说明
+- **关键决策汇总**：每个不平凡的决策及其 why
+- **偏差记录**：任何超出计划的改动（必须记录原因）
+- **已知风险**：需要 reviewer 或 tester 重点关注的地方
+
+然后调用 `AskUserQuestion` 询问下一步：
 
 - `header`：「下一步」
 - `multiSelect: false`
@@ -119,3 +153,13 @@ plugin_root: <plugin-root>
   - `label: 暂不审查` / `description: 稍后手动运行 /review`
 
 若用户选择「执行代码审查」，调用 forge-review skill 执行 `/review`。
+
+---
+
+## 边界约定
+
+- **按 task.md 的步骤逐个执行**，不跳步，不合并步骤
+- **每步独立验证**，步骤间不依赖隐含的上下文
+- **发现计划外改动时必须记录**，在汇总"偏差记录"节中详细说明为什么需要这些改动
+- **不覆盖现有测试**，若发现现有测试因本次改动失败，在汇总中说明，由 /review 决策
+- **新增依赖需明确说明**，若需要引入新的库或框架，在汇总的"决策"节中说明为什么

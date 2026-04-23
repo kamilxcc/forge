@@ -1,10 +1,9 @@
 ---
 name: forge-kb
 description: >
-  Forge 知识库管理能力。负责初始化和更新目标项目的 .forge-kb/ 知识库。
-  触发命令：/init-kb 或 /update-kb --since=<N>d。
-  /init-kb：引导用户填充最小存活集（project.yaml + glossary.yaml + module-map.yaml）。
-  /update-kb：分析最近变更，推断需要更新的知识库文件，展示给用户确认后执行。
+  当用户需要初始化或更新项目知识库时触发，例如运行 /init-kb、/update-kb、"初始化知识库"、"更新知识库"。
+  /init-kb：在目标项目创建 .forge-kb/ 目录结构，引导用户填充最小存活集（project.yaml + glossary.yaml + module-map.yaml）。
+  /update-kb --since=<N>d：分析最近 git 变更，推断需要更新的知识库文件，展示给用户确认后执行。
 ---
 
 # forge-kb — 知识库管理
@@ -98,7 +97,8 @@ Read `.forge-kb/meta/project.yaml`，然后向用户逐项确认：
 - meta/module-map.yaml — N 个模块
 
 下一步可以：
-- /plan <需求描述> — 开始你的第一个功能
+- /clarify <需求描述> — 多轮对话精化需求文档
+- /go <需求描述> — 使用智能路由，自动判断执行流程
 - /onboard <模块名> — 深入了解某个模块
 ```
 

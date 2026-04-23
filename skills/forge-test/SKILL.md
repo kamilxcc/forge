@@ -1,10 +1,9 @@
 ---
 name: forge-test
 description: >
-  Forge 测试编写能力。为本次实现的变更生成测试代码并执行确认。
-  触发命令：/test。
-  输入：implementer 的实施完成汇总 + 方案文档。
-  输出：测试文件 + 测试报告。
+  当实现完成、用户需要补充测试时触发，例如运行 /test、"写测试"、"帮我补测试"。
+  读取 plan.md 提取验收条件，匹配项目现有测试风格，生成测试文件并运行，输出测试报告。
+  输出四值判定：DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED。
 ---
 
 # forge-test — 测试编写与执行
@@ -13,16 +12,22 @@ description: >
 
 forge-test 负责为本次实现的变更生成测试代码，并执行测试确认通过。
 
-**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）
+**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）+ AskUserQuestion
 
 ---
 
 ## 输入
 
-- implementer 输出的"实施完成汇总"（变更文件列表）
+变更文件列表优先级：
+1. 若调用方（implementer 汇总）传入了变更文件列表 → 直接使用
+2. 否则，请求主 Claude 执行 `git diff HEAD --name-only` 获取
+3. 若无法获取 → 请用户提供文件路径列表
+
+其他输入：
 - 对应的 `work/<project-name>/<dated-slug>/plan.md`（方案文档，用于提取验收条件）
+- 对应的 `work/<project-name>/<dated-slug>/requirement.md`（需求文档，用于验收标准）
 - `.forge-kb/` 知识库上下文
-- 项目现有测试文件（用于匹配风格）
+- 项目现有测试文件（用于匹配测试风格和框架）
 
 ---
 
@@ -110,12 +115,20 @@ class XxxTest {
 **Feature**：<功能名>
 **测试框架**：<框架名>
 
+### 最终判定：<DONE ✅ | DONE_WITH_CONCERNS ⚠️ | NEEDS_CONTEXT 🔍 | BLOCKED 🚫>
+
+> 判定说明：
+> - DONE：所有 P0 测试通过，无未覆盖的关键场景
+> - DONE_WITH_CONCERNS：P0 通过，但有 P1 未覆盖或有轻微风险
+> - NEEDS_CONTEXT：缺少运行测试所需的环境/依赖，无法完成验证
+> - BLOCKED：有 P0 测试失败，或发现被测代码 bug
+
 ### 覆盖场景
 
-| 测试类 | 方法 | 场景 | 结果 |
-|-------|------|------|------|
-| `XxxTest` | `should_xxx_when_yyy` | 正常路径 | ✅ PASS |
-| ... | ... | ... | ❌ FAIL（说明原因）|
+| 测试类 | 方法 | 场景 | 优先级 | 结果 |
+|-------|------|------|-------|------|
+| `XxxTest` | `should_xxx_when_yyy` | 正常路径 | P0 | ✅ PASS |
+| ... | ... | ... | ... | ❌ FAIL（说明原因）|
 
 ### 未覆盖场景（建议后续补充）
 
@@ -124,7 +137,8 @@ class XxxTest {
 ### 总结
 
 测试结果：<N> 通过，<M> 失败
-<若有失败>：发现以下问题需要修复：...
+<若判定为 BLOCKED>：发现以下问题需要修复：...
+<若判定为 DONE_WITH_CONCERNS>：以下关注点建议跟进：...
 ```
 
 ---
