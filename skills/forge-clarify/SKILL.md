@@ -130,7 +130,8 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 - `header`：「文档确认」
 - `multiSelect: false`
 - `options`：
-  - `label: 确认，开始方案设计` / `description: 内容无误，直接启动 /plan`
+  - `label: 确认，开始方案设计` / `description: 内容无误，保存需求文档并立即启动 /plan`
+  - `label: 确认，仅保存` / `description: 内容无误，保存需求文档，稍后手动运行 /plan`
   - `label: 需要修改` / `description: 请在 Other 里说明需要改哪里`
 
 若用户选择「需要修改」或在 Other 中输入反馈，更新对应节后重新执行第 7 步自查，再展示草稿确认，**最多修改 3 轮**。
@@ -143,21 +144,13 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 然后进入第 8 步写文档，或停止流程让用户决定。
 
-### 第 8 步：确认后操作
+### 第 8 步：写入需求文档
 
-用户选「确认，开始方案设计」后，询问（调用 `AskUserQuestion`）：
+**若用户选「确认，开始方案设计」**：执行写入，完成后立即调用 `Skill("forge-plan")`。
 
-- `header`：「下一步」
-- `multiSelect: false`
-- `options`：
-  - `label: 保存并自动开始方案设计` / `description: 将需求保存到磁盘，然后启动 /plan 生成技术方案`
-  - `label: 仅保存需求文档` / `description: 保存需求文档到磁盘，稍后手动运行 /plan`
+**若用户选「确认，仅保存」**：仅执行写入，不调用 forge-plan。
 
-**若选「保存并自动开始方案设计」**：执行第 9 步，然后立即调用 `Skill("forge-plan")`。
-
-**若选「仅保存需求文档」**：仅执行第 9 步，不调用 forge-plan。
-
-### 第 9 步：写入需求文档
+写入步骤：
 
 1. 确定 slug：`<verb>-<noun>` 格式，用 `-` 连接，如 `clear-channel-unread`
 2. 读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name` 作为 `<project-name>`
@@ -238,7 +231,7 @@ related_modules: [<module1>, <module2>]
 ## 上下游关系
 
 **上游**：`/go` — forge 可以主动调用本 skill  
-**下游**：`/plan` — 本 skill 若选「保存并自动开始方案设计」会自动调用 forge-plan
+**下游**：`/plan` — 本 skill 若选「确认，开始方案设计」会自动调用 forge-plan
 
 ---
 
