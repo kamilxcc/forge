@@ -25,6 +25,31 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 ## 执行流程
 
+### 第 -1 步：-l Flag 检测（按需）
+
+若用户命令包含 `-l` flag（如 `/clarify -l`）：
+
+1. 运行 `bash <plugin-root>/scripts/list-features.sh --project-name <project-name> --plugin-root <plugin-root>`
+2. 按 `<plugin-root>/references/feature-selector.md` 展示选择器，得到 `active_slug`
+
+选中后进入已有需求的重新澄清流程：
+- 若 `work/<project-name>/<active_slug>/requirement.md` 已存在 → 跳过第 0 步，直接从**第 2 步**开始，预填 requirement.md 内容，并告知用户：
+  ```
+  📂 已加载需求：work/<project-name>/<active_slug>/requirement.md
+     我们来重新审视这个需求，看看是否有需要补充或修正的地方。
+  ```
+- 若 requirement.md 不存在 → 从**第 2 步**开始，告知用户：
+  ```
+  📂 已切换到需求：<active_slug>（尚无 requirement.md）
+     请描述这个需求的核心内容，我们来整理它。
+  ```
+
+后续写入文件时使用 `active_slug` 对应目录，**不更新 `.current-feature`**。
+
+若命令不含 `-l`，跳过本步。
+
+---
+
 ### 第 0 步：前置检查
 
 读取目标项目 `.forge-kb/meta/project.yaml`，若文件不存在，提示：
