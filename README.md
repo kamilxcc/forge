@@ -11,7 +11,7 @@
 在项目目录下启动 Claude Code 时，通过 `--plugin-dir` 指定本地插件路径：
 
 ```bash
-claude --plugin-dir /Users/kamilxiao/code/forge-plugin（替换成自己的本地目录）
+claude --plugin-dir /Users/kamilxiao/code/forge-plugin（替换成自己的本地安装目录）
 ```
 
 ---
