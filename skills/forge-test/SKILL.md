@@ -33,16 +33,6 @@ forge-test 负责为本次实现的变更生成测试代码，并执行测试确
 
 ## 执行流程
 
-### 第 0 步：解析 plugin-root 路径
-
-**`<plugin-root>` 定义**：包含 `skills/`、`work/`、`references/` 子目录的插件根目录。
-
-本 skill 文件位于 `<plugin-root>/skills/forge-test/SKILL.md`，因此：
-- plugin-root = 本文件向上**两级**目录
-- 例：本文件路径为 `/Users/foo/forge-plugin/skills/forge-test/SKILL.md` → `<plugin-root>` = `/Users/foo/forge-plugin`
-
-所有文档读写路径均基于此，如 `<plugin-root>/work/<project-name>/...`。
-
 ### 第 1 步：加载知识库上下文
 
 按 `<plugin-root>/references/knowledge-load-protocol.md` 执行 Always-On 层加载。
