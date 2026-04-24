@@ -51,6 +51,28 @@ Read `task_path` 和 `plan_path`，提取：
 - 每步涉及的文件和改动目标
 - 风险点和依赖
 
+### 第 2.5 步：task.md 格式 Pre-flight 检查（记录日志，不阻塞）
+
+读取文档后，**立即运行校验脚本**：
+
+```
+Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
+```
+
+**若校验通过（exit 0）**：继续第 3 步，不做任何提示。
+
+**若校验失败（exit 1）**：**打印违规日志，然后继续执行**，不阻塞流程：
+
+```
+⚠️ Pre-flight 校验发现以下 task.md 格式问题（已记录，不影响执行）：
+
+<脚本输出的违规列表>
+
+继续按计划执行...
+```
+
+执行过程中遇到与违规相关的步骤（如路径找不到、行号对不上）时，按正常 NEEDS_CONTEXT 流程上报，不重复提及 pre-flight 警告。
+
 ### 第 3 步：用 TodoWrite 初始化任务列表
 
 在开始执行前，调用 `TodoWrite` 把所有步骤写入任务列表，状态全部设为 `pending`：
@@ -71,7 +93,10 @@ TodoWrite([
 
 每步执行前：
 1. 调用 `TodoWrite` 将当前步骤状态从 `pending` 改为 `in_progress`
-2. Read task.md 中本步骤声明的文件路径，**不做额外 Glob/Grep**（task.md 已由 /plan 定位好文件）
+2. 读取 task.md 中本步骤声明的文件路径，**不做额外 Glob/Grep**（task.md 已由 /plan 定位好文件）
+   - 若 `文件` 字段格式为 `path:start-end`（如 `/path/Foo.kt:23-35`）→ 直接 `Read(path, offset=start, limit=end-start+1)` 精准读取，**不全文 Read**
+   - 若 `文件` 字段只有路径（新建文件场景）→ 按需 Read 或直接 Write
+   - **信息缺口上报**：若步骤中有任何无法从 task.md 直接获取的信息（方法名不存在、行号与实际不符、文件路径找不到）→ **立即停止当前步骤，上报 `NEEDS_CONTEXT`**，说明缺失的具体信息，**不得用 grep/find 自行搜索补全**
 3. 检查该步骤是否会触碰 KB 中的 CRITICAL 规则，若有，先说明处理方式
 4. **Scope Guard**：对比本步骤即将修改的文件与 task.md 中该步骤声明的文件列表：
    - 若完全一致 → 继续执行

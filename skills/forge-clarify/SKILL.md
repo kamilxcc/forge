@@ -82,6 +82,7 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 - 一句话需求摘要（≤ 20 字）
 - 推测涉及的模块列表（1-3 个）
 - 潜在影响点（如"修改 X 可能影响 Y"）
+- **候选文件列表**（内部暂存）：Glob/Grep 命中的文件路径 + 一句话说明为何候选，格式：`<绝对路径> — <原因>`
 
 **需求复杂度分级**（同步在此完成，决定后续挖掘深度）：
 
@@ -143,7 +144,7 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 ### 第 4 步：影响分析补充（按需）
 
-若第 3 步用户回答中提到「影响现有功能」但第 2 步静默探索未覆盖，此时再做一轮 Glob/Grep（≤ 5 次），补全涉及模块。无新发现则直接进入第 5 步。
+若第 3 步用户回答中提到「影响现有功能」但第 2 步静默探索未覆盖，此时再做一轮 Glob/Grep（≤ 5 次），补全涉及模块。将新发现的文件路径**追加到内部候选文件列表**（与第 2 步同格式）。无新发现则直接进入第 5 步。
 
 ### 第 5 步：场景与验收标准
 
@@ -271,7 +272,7 @@ Reviewer 完成后，将其输出按以下规则处理：
    - 优先：读取目标项目 `.forge-kb/meta/project.yaml` 中的 `project.name`
    - 若无法读取（无知识库模式）：使用当前工作目录的最后一段路径名作为 `<project-name>`（如 `/Users/foo/myapp` → `myapp`）
 3. 确定目录：`<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/`（日期取今天）
-4. Write `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板）
+4. Write `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板；**若内部候选文件列表非空，填入「候选文件」节**）
 5. Write `<plugin-root>/work/<project-name>/.current-feature`：
 
 ```
@@ -340,6 +341,12 @@ related_modules: [<module1>, <module2>]
 ## 外部依赖
 
 - <依赖1>（无则删除本节）
+
+## 候选文件
+
+<!-- 由 /clarify 静默探索自动填入，供 /plan 跳过 Stage A 使用；人工勿手动维护 -->
+<!-- 格式：- `<绝对路径>` — <一句话说明为何候选> -->
+<!-- 若 clarify 未做 Glob/Grep（无知识库模式），此节为空，/plan 正常走 Stage A -->
 ```
 
 ---
