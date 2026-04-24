@@ -1,13 +1,19 @@
 ---
 name: forge-kb
 description: >
-  当用户需要初始化或更新项目知识库时触发，例如运行 /init-kb、/update-kb、"初始化知识库"、"更新知识库"。
-  /init-kb：扫描目标项目目录结构，推断模块划分、设计模式和依赖关系，引导用户确认后生成 .forge-kb/ 目录结构，
-  并填充最小存活集（project.yaml + glossary.yaml + module-map.yaml + 各模块 index.md 骨架）。
-  /update-kb --since=<N>d：分析最近 git 变更，推断需要更新的知识库文件，展示给用户确认后执行。
+  ⚠️ 已废弃（DEPRECATED）：此 skill 不再使用。知识库基础设施（.forge-kb/）已移除，
+  项目上下文改由目标项目根目录的 CLAUDE.md 承载，Claude Code 会在 session 启动时自动加载。
+  /init-kb 和 /update-kb 命令已停用，无需执行。
 ---
 
-# forge-kb — 知识库管理
+# forge-kb — 知识库管理（已废弃）
+
+> ⚠️ **此 skill 已废弃，不再使用。**
+>
+> 知识库基础设施（`.forge-kb/`）已从 forge-plugin 中移除。项目上下文（术语表、模块路径、编码规范）
+> 请直接写入目标项目根目录的 `CLAUDE.md`，Claude Code 会在 session 启动时自动加载。
+>
+> `/init-kb` 和 `/update-kb` 命令已停用，无需执行。
 
 ## 你的角色
 

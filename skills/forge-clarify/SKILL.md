@@ -2,8 +2,7 @@
 name: forge-clarify
 description: >
   当需求不清晰、用户需要多轮对话厘清需求时触发，例如运行 /clarify、"把需求捋清楚"、"需求不够明确"。
-  执行 9 步需求访谈和自查，生成 requirement.md。
-  知识库可选：有 .forge-kb/ 时加载上下文，无则在无知识库模式下运行。
+  执行需求访谈和自查，生成 requirement.md。
 ---
 
 # forge-clarify — 需求访谈与精化
@@ -19,7 +18,6 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 ## 输入
 
 - 用户的原始需求描述（通常模糊或不完整）
-- `.forge-kb/meta/project.yaml` 获取项目上下文
 
 ---
 
@@ -50,33 +48,13 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 ---
 
-### 第 0 步：前置检查
-
-尝试读取目标项目 `.forge-kb/meta/project.yaml`：
-- 若文件存在 → 正常继续
-- 若文件不存在 → 输出警告并继续：
-
-```
-⚠️ 未找到知识库（.forge-kb/meta/project.yaml 不存在）。
-   当前将在无知识库模式下运行，模块上下文和术语映射不可用。
-   如需完整上下文支持，可运行 /init-kb 初始化知识库。
-```
-
-无知识库模式下，跳过第 1 步的模块探索，直接进入第 2 步静默探索（省略模块映射部分）。
-
-### 第 1 步：加载知识库上下文
-
-按 `<plugin-root>/references/knowledge-load-protocol.md` 执行 Always-On 层加载（meta/ 和 rules 文件）。
-
 ### 第 2 步：静默探索（不打扰用户）
 
 收到需求后，**不立刻开口问用户**，先做静默探索，带着信息再批量提问（第 3 步），减少用户往返次数。
 
 **静默探索内容**：
 
-1. 读取 `.forge-kb/meta/glossary.yaml`，将需求关键词映射到代码术语（如"频道" → `Channel`）
-2. 读取 `.forge-kb/modules/module-map.yaml`，找出需求可能涉及的模块路径
-3. 对识别出的模块做**轻量 Glob/Grep**（≤ 3 次 Glob + ≤ 3 次 Grep，禁止 Read）：找关键类名/文件路径，为第 3 步的「我检测到…」铺垫
+1. 对需求关键词做**轻量 Glob/Grep**（≤ 3 次 Glob + ≤ 3 次 Grep，禁止 Read）：找关键类名/文件路径，为第 3 步的「我检测到…」铺垫
 
 **产出（内部）**：
 - 一句话需求摘要（≤ 20 字）
@@ -268,9 +246,7 @@ Reviewer 完成后，将其输出按以下规则处理：
 写入步骤：
 
 1. 确定 slug：`<verb>-<noun>` 格式，用 `-` 连接，如 `clear-channel-unread`
-2. 获取 `<project-name>`：
-   - 优先：读取目标项目 `.forge-kb/meta/project.yaml` 中的 `project.name`
-   - 若无法读取（无知识库模式）：使用当前工作目录的最后一段路径名作为 `<project-name>`（如 `/Users/foo/myapp` → `myapp`）
+2. 获取 `<project-name>`：使用当前工作目录的最后一段路径名（如 `/Users/foo/myapp` → `myapp`）
 3. 确定目录：`<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/`（日期取今天）
 4. Write `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板；**若内部候选文件列表非空，填入「候选文件」节**）
 5. Write `<plugin-root>/work/<project-name>/.current-feature`：

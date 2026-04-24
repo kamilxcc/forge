@@ -23,13 +23,11 @@ model: inherit
 **方式 A（推荐）：内嵌文本**（直接嵌入 task.md 和 plan.md 的全文内容）
 - `task_content`：task.md 的完整文本
 - `plan_content`：plan.md 的完整文本
-- `kb_path`：目标项目 `.forge-kb/` 的绝对路径
 - `plugin_root`：forge-plugin 根目录的绝对路径
 
 **方式 B（兼容）：路径传参**
 - `task_path`：task.md 的绝对路径
 - `plan_path`：plan.md 的绝对路径
-- `kb_path`：目标项目 `.forge-kb/` 的绝对路径
 - `plugin_root`：forge-plugin 根目录的绝对路径
 
 方式 A 时跳过第 2 步中的文件 Read，直接使用传入的文本内容。
@@ -38,20 +36,14 @@ model: inherit
 
 ## 执行流程
 
-### 第 1 步：加载知识库上下文
-
-按 `<plugin_root>/references/knowledge-load-protocol.md` 执行三级加载（使用传入的 `kb_path`）。
-
-加载完成后，从 glossary 和 rules 中提取与本任务相关的**约束和风险**，在执行前心算一遍。
-
-### 第 2 步：读取计划文档
+### 第 1 步：读取计划文档
 
 Read `task_path` 和 `plan_path`，提取：
 - 步骤列表和总步骤数
 - 每步涉及的文件和改动目标
 - 风险点和依赖
 
-### 第 2.5 步：task.md 格式 Pre-flight 检查（记录日志，不阻塞）
+### 第 1.5 步：task.md 格式 Pre-flight 检查（记录日志，不阻塞）
 
 读取文档后，**立即运行校验脚本**：
 
@@ -59,7 +51,7 @@ Read `task_path` 和 `plan_path`，提取：
 Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
 ```
 
-**若校验通过（exit 0）**：继续第 3 步，不做任何提示。
+**若校验通过（exit 0）**：继续第 2 步，不做任何提示。
 
 **若校验失败（exit 1）**：**打印违规日志，然后继续执行**，不阻塞流程：
 
@@ -73,7 +65,7 @@ Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
 
 执行过程中遇到与违规相关的步骤（如路径找不到、行号对不上）时，按正常 NEEDS_CONTEXT 流程上报，不重复提及 pre-flight 警告。
 
-### 第 3 步：用 TodoWrite 初始化任务列表
+### 第 2 步：用 TodoWrite 初始化任务列表
 
 在开始执行前，调用 `TodoWrite` 把所有步骤写入任务列表，状态全部设为 `pending`：
 
@@ -87,7 +79,7 @@ TodoWrite([
 
 这样用户在 Claude Code UI 的任务面板里能实时看到所有步骤及其完成状态。
 
-### 第 4 步：逐步执行
+### 第 3 步：逐步执行
 
 **按计划步骤顺序执行，不可跳步，不可合并步骤**。
 
@@ -97,7 +89,7 @@ TodoWrite([
    - 若 `文件` 字段格式为 `path:start-end`（如 `/path/Foo.kt:23-35`）→ 直接 `Read(path, offset=start, limit=end-start+1)` 精准读取，**不全文 Read**
    - 若 `文件` 字段只有路径（新建文件场景）→ 按需 Read 或直接 Write
    - **信息缺口上报**：若步骤中有任何无法从 task.md 直接获取的信息（方法名不存在、行号与实际不符、文件路径找不到）→ **立即停止当前步骤，上报 `NEEDS_CONTEXT`**，说明缺失的具体信息，**不得用 grep/find 自行搜索补全**
-3. 检查该步骤是否会触碰 KB 中的 CRITICAL 规则，若有，先说明处理方式
+3. 检查该步骤是否会触碰项目约束（CLAUDE.md 中的规则），若有，先说明处理方式
 4. **Scope Guard**：对比本步骤即将修改的文件与 task.md 中该步骤声明的文件列表：
    - 若完全一致 → 继续执行
    - 若需要额外修改计划外的文件 → **先说明原因**（是计划遗漏、依赖关系、还是发现了新问题），再继续；并在汇总"偏差记录"节标注
@@ -116,7 +108,7 @@ TodoWrite([
 2. 按 `<plugin_root>/references/structured-step-output.md` 输出 Step N 摘要
 3. 将 task.md 中对应步骤的 `- [ ]` 改为 `- [x]`（持久化到文件，供事后查阅）
 
-### 第 5 步：输出汇总并询问下一步
+### 第 4 步：输出汇总并询问下一步
 
 所有步骤完成后，按 `<plugin_root>/references/structured-step-output.md` 中的"汇总格式"输出。
 
@@ -146,19 +138,6 @@ TodoWrite([
 2. **不引入不必要的依赖**：新增 import 前先确认项目是否已有等价工具
 3. **Scope Guard（不可绕过）**：每步执行前必须对照 task.md 声明的文件范围，超界改动必须先说明理由并在汇总记录；不得静默修改计划外模块
 4. **Bash 命令执行前必须说明目的**：不要静默执行可能有副作用的命令
-
-### 遭遇 KB 约束时的处理
-
-若执行过程中遭遇 KB 中 `level: critical` 的规则：
-
-```
-⚠️  触碰关键约束：<rule.alert>
-    规则来源：<rule.id>（<rule.source>）
-    
-    计划处理方式：<你打算怎么做来满足这条约束>
-    
-    继续执行...
-```
 
 ### 编译/测试失败的处理
 
