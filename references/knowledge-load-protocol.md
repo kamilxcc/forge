@@ -5,17 +5,6 @@
 
 ---
 
-## plugin-root 路径约定
-
-**`<plugin-root>`** 定义：调用本协议的 skill 文件所在目录向上两级。
-
-> 例：skill 文件路径为 `/Users/foo/forge-plugin/skills/forge-plan/SKILL.md`
-> → `<plugin-root>` = `/Users/foo/forge-plugin`
-
-本协议及所有 skill 中出现的 `<plugin-root>` 均按此规则解析。
-
----
-
 ## 知识库加载步骤（每次任务开始时执行）
 
 **第 1 步：定位知识库**
