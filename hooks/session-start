@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# SessionStart hook for forge plugin
+# 在每次会话开始时将 plugin_root 路径注入到 Claude 的上下文中
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+context="<forge-plugin-root>${PLUGIN_ROOT}</forge-plugin-root>\n\nForge plugin 已加载。所有 skill 中出现的 <plugin-root> 均指向：${PLUGIN_ROOT}"
+context_escaped=$(escape_for_json "$context")
+
+printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context_escaped"
+
+exit 0
