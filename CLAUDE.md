@@ -105,3 +105,4 @@ When editing templates, keep the inline maintenance instructions (Chinese commen
 - **Language**: SKILL.md files and templates are authored in Chinese; skill content should match. Code comments in scripts can be either.
 - **Permissions file**: `.claude/settings.json` at the repo root grants broad Read/Write/Edit/Bash — it is the *plugin-development* config, not the target-project config. Changes here affect only sessions opened in this directory.
 - **Sibling global rule**: the user's global `~/.claude-internal/CLAUDE.md` forbids auto-committing. Never run `git commit` on the user's behalf unless asked.
+- **No auto-push**: 每次编辑后不要自动执行 `git push`。所有推送操作由用户自行决定何时执行。
