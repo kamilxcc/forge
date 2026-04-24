@@ -9,17 +9,27 @@
 
 **第 1 步：定位知识库**
 
-检查目标项目根目录是否存在 `.forge-kb/` 目录：
+1a. 先确认当前 `<project-name>`（从 `work/` 下的目录名或任务上下文获取）。
+
+1b. 读取状态文件：
 
 ```
-IF .forge-kb/ 不存在:
+<plugin-root>/work/<project-name>/.kb-path
+```
+
+该文件由 `/init-kb` 写入，内容为知识库的绝对路径（如 `/Users/xxx/code/my-project/.forge-kb`）。
+
+1c. 若状态文件不存在，则 fallback 到检查当前目录是否存在 `.forge-kb/`：
+
+```
+IF .kb-path 文件不存在 AND .forge-kb/ 不存在:
   输出警告：
-    ⚠️  未找到知识库（.forge-kb/ 不存在）。
+    ⚠️  未找到知识库（.kb-path 未记录，.forge-kb/ 也不存在）。
         运行 /init-kb 可初始化知识库以获得更好的 AI 支持。
         当前将在无知识库模式下继续任务。
   继续执行任务（不中断，不报错）
 ELSE:
-  继续第 2 步
+  继续第 2 步，使用找到的知识库路径
 ```
 
 **第 2 步：Always-On 层（始终加载）**
@@ -28,19 +38,19 @@ ELSE:
 ```bash
 bash <plugin-root>/scripts/kb-load.sh \
   --tier always \
-  --kb-path <project-root>/.forge-kb
+  --kb-path <kb-root>
 ```
 
 将输出注入当前上下文（直接 Read 两个文件等价）。
 
 若脚本不可用，手动 Read：
-- `.forge-kb/meta/project.yaml`
-- `.forge-kb/meta/glossary.yaml`
+- `<kb-root>/meta/project.yaml`
+- `<kb-root>/meta/glossary.yaml`
 
 **第 3 步：Task-Scoped 层（按任务推断后加载）**
 
 3a. 用 module-resolver 推断涉及模块：
-- 读 `.forge-kb/meta/module-map.yaml`
+- 读 `<kb-root>/meta/module-map.yaml`
 - 将任务描述中出现的类名/路径/功能词与 `paths` 字段做模糊匹配
 - 找不到匹配时跳过，不报错
 
@@ -48,7 +58,7 @@ bash <plugin-root>/scripts/kb-load.sh \
 ```bash
 bash <plugin-root>/scripts/kb-load.sh \
   --tier task \
-  --kb-path <project-root>/.forge-kb \
+  --kb-path <kb-root> \
   --modules "<module1>,<module2>" \
   --keywords "<kw1>,<kw2>"
 ```
@@ -58,8 +68,8 @@ bash <plugin-root>/scripts/kb-load.sh \
 **第 4 步：On-Demand 层（执行中按需读取）**
 
 执行过程中遇到需要深入了解的子域时，按需 Read：
-- `.forge-kb/modules/<name>/<subdomain>.md`（如 tab-system.md）
-- `.forge-kb/experience/cases/<slug>.md`（具体案例）
+- `<kb-root>/modules/<name>/<subdomain>.md`（如 tab-system.md）
+- `<kb-root>/experience/cases/<slug>.md`（具体案例）
 
 ---
 

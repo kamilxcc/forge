@@ -16,11 +16,31 @@ build:
   # 特殊说明（可选）：如"必须用 ./rb 而不是 gradle"
 
 architecture:
-  pattern: "MVVM"              # 整体架构模式
+  pattern: "MVVM"              # 整体架构模式（如 MVVM / MVP / MVI / Clean Architecture）
   di_framework: "手动 IOC"     # 依赖注入框架（如 Hilt / Koin / 无）
   notes: |
     填写架构中 Agent 可能误判的特殊点。
     例如："不使用 Jetpack Navigation，用自研路由 XXRouter"
+
+  # 模块划分（由 /init-kb 扫描分析后自动填充，可人工修改）
+  modules:
+    # 示例条目：
+    # - name: "feed"
+    #   path: "feature/feed/"
+    #   desc: "信息流模块"
+    # - name: "chat"
+    #   path: "feature/chat/"
+    #   desc: "聊天模块"
+
+  # 模块间依赖关系（由 /init-kb 分析后自动填充，可人工修改）
+  dependencies:
+    # 示例条目：
+    # - from: "feed"
+    #   to: "common"
+    #   reason: "依赖公共组件库"
+    # - from: "chat"
+    #   to: "network"
+    #   reason: "依赖网络层"
 
 team:
   owners: ["dev-a", "dev-b"]   # 项目负责人（可选）

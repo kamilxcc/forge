@@ -2,9 +2,11 @@
 # init-kb.sh — 在目标项目根目录创建 .forge-kb/ 知识库骨架
 #
 # 用法:
-#   init-kb.sh                   # 在当前目录初始化
-#   init-kb.sh --path /some/dir  # 在指定目录初始化
-#   init-kb.sh --force           # 已存在时覆盖
+#   init-kb.sh                              # 在当前目录初始化
+#   init-kb.sh --path /some/dir             # 在指定目录初始化
+#   init-kb.sh --force                      # 已存在时覆盖
+#   init-kb.sh --project-name <name>        # 项目名称（用于写 .kb-path 状态文件）
+#   init-kb.sh --plugin-root /some/dir      # forge-plugin 根目录（用于写 .kb-path）
 #
 # 退出码:
 #   0 成功
@@ -25,6 +27,8 @@ fi
 
 TARGET_PATH="$(pwd)"
 FORCE=0
+PROJECT_NAME=""
+PLUGIN_ROOT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -35,6 +39,14 @@ while [[ $# -gt 0 ]]; do
     --force)
       FORCE=1
       shift
+      ;;
+    --project-name)
+      PROJECT_NAME="$2"
+      shift 2
+      ;;
+    --plugin-root)
+      PLUGIN_ROOT="$2"
+      shift 2
       ;;
     -h|--help)
       grep '^#' "$0" | sed 's/^# \{0,1\}//'
@@ -129,6 +141,14 @@ EOF
 
 # 初始化 .state/ 下空文件(供 Hook 追加)
 : > "${KB_DIR}/.state/modified-files.txt"
+
+# 若提供了 project-name 和 plugin-root，则写入 .kb-path 状态文件
+if [[ -n "${PROJECT_NAME}" && -n "${PLUGIN_ROOT}" ]]; then
+  WORK_DIR="${PLUGIN_ROOT}/work/${PROJECT_NAME}"
+  mkdir -p "${WORK_DIR}"
+  echo "${KB_DIR}" > "${WORK_DIR}/.kb-path"
+  echo "📌 知识库路径已记录: ${WORK_DIR}/.kb-path"
+fi
 
 echo "✅ Forge 知识库已初始化: ${KB_DIR}"
 echo ""
