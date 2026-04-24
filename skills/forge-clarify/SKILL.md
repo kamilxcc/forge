@@ -3,7 +3,7 @@ name: forge-clarify
 description: >
   当需求不清晰、用户需要多轮对话厘清需求时触发，例如运行 /clarify、"把需求捋清楚"、"需求不够明确"。
   执行 9 步需求访谈和自查，生成 requirement.md。
-  前置条件：必须在 .forge-kb/ 初始化完成后运行（缺 .forge-kb/ 时提示 /init-kb）。
+  知识库可选：有 .forge-kb/ 时加载上下文，无则在无知识库模式下运行。
 ---
 
 # forge-clarify — 需求访谈与精化
@@ -52,14 +52,17 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 ### 第 0 步：前置检查
 
-读取目标项目 `.forge-kb/meta/project.yaml`，若文件不存在，提示：
+尝试读取目标项目 `.forge-kb/meta/project.yaml`：
+- 若文件存在 → 正常继续
+- 若文件不存在 → 输出警告并继续：
 
 ```
-❌ 项目知识库未初始化。
-   请先运行 /init-kb 创建知识库结构，再运行 /clarify。
+⚠️ 未找到知识库（.forge-kb/meta/project.yaml 不存在）。
+   当前将在无知识库模式下运行，模块上下文和术语映射不可用。
+   如需完整上下文支持，可运行 /init-kb 初始化知识库。
 ```
 
-停止执行。
+无知识库模式下，跳过第 1 步的模块探索，直接进入第 2 步静默探索（省略模块映射部分）。
 
 ### 第 1 步：加载知识库上下文
 
@@ -186,7 +189,9 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 写入步骤：
 
 1. 确定 slug：`<verb>-<noun>` 格式，用 `-` 连接，如 `clear-channel-unread`
-2. 读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name` 作为 `<project-name>`
+2. 获取 `<project-name>`：
+   - 优先：读取目标项目 `.forge-kb/meta/project.yaml` 中的 `project.name`
+   - 若无法读取（无知识库模式）：使用当前工作目录的最后一段路径名作为 `<project-name>`（如 `/Users/foo/myapp` → `myapp`）
 3. 确定目录：`<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/`（日期取今天）
 4. Write `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板）
 5. Write `<plugin-root>/work/<project-name>/.current-feature`：

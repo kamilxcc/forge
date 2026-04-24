@@ -70,7 +70,11 @@ Read 1-2 个同模块的测试文件，提取：
 
 ### 第 3 步：从方案文档提取测试场景
 
-读取目标项目 `.forge-kb/meta/project.yaml` 获取 `project.name`，再读 `<plugin-root>/work/<project-name>/.current-feature` 获取 `<dated-slug>`，然后 Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，从"实现步骤"和"风险点"节提取测试矩阵：
+获取 `<project-name>`：
+- 优先：读取目标项目 `.forge-kb/meta/project.yaml` 中的 `project.name`
+- 若无法读取（无知识库）：使用当前工作目录的最后一段路径名作为 `<project-name>`
+
+再读 `<plugin-root>/work/<project-name>/.current-feature` 获取 `<dated-slug>`，然后 Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，从"实现步骤"和"风险点"节提取测试矩阵：
 
 | 场景 | 输入条件 | 期望行为 | 优先级 |
 |------|---------|---------|-------|
