@@ -25,6 +25,16 @@ forge-clarify 负责需求的 9 步访谈和自查。你用多轮对话从用户
 
 ## 执行流程
 
+### 第 -0.5 步：解析 plugin-root 路径
+
+**`<plugin-root>` 定义**：包含 `skills/`、`work/`、`references/` 子目录的插件根目录。
+
+本 skill 文件位于 `<plugin-root>/skills/forge-clarify/SKILL.md`，因此：
+- plugin-root = 本文件向上**两级**目录
+- 例：本文件路径为 `/Users/foo/forge-plugin/skills/forge-clarify/SKILL.md` → `<plugin-root>` = `/Users/foo/forge-plugin`
+
+所有文档读写路径均基于此，如 `<plugin-root>/work/<project-name>/...`。
+
 ### 第 -1 步：-l Flag 检测（按需）
 
 若用户命令包含 `-l` flag（如 `/clarify -l`）：
