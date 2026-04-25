@@ -34,7 +34,11 @@
 读取 task.md 中的 `recommended_mode` 字段（或手动数步骤列表），**直接按推荐模式执行，不弹 AskUserQuestion**：
 
 - **≤ 3 步**：直接进入 inline 执行
-- **> 3 步**：派发 forge-executor Agent
+- **4–6 步**：派发 forge-executor Agent
+- **> 6 步**：派发 forge-executor Agent，同时输出：
+  ```
+  ⚠️ 步骤数超过 6，建议与用户拆分为多个子需求后分批执行。
+  ```
 
 执行前输出一行提示说明当前模式：
 ```

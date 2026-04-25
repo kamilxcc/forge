@@ -189,8 +189,7 @@ Reviewer 完成后，将其输出按以下规则处理：
 2. 获取 `<project-name>`：使用当前工作目录的最后一段路径名（如 `/Users/foo/myapp` → `myapp`）
 3. Write 需求文档到 `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板；**若内部候选文件列表非空，填入「候选文件」节**）
 4. Write `.current-feature` 为 `YYYY-MM-DD-<slug>`
-
-6. 展示成功提示：
+5. 展示成功提示：
 
 ```
 ✅ 需求文档已保存：work/<project-name>/YYYY-MM-DD-<slug>/requirement.md
