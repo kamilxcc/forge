@@ -29,9 +29,8 @@ TodoWrite([
 2. **约束核对**：对照执行约束基线（设计决策/边界约定/风险点），检查本步改动是否违反；有冲突 → 【inline】AskUserQuestion 说明冲突 / 【Agent】记录到偏差记录并自主决策是否继续
 
 ### 理解步骤
-- task.md 是自包含的（/plan 的 Stage B 已把关键代码片段内联进来），**直接读 task.md 本步骤内容执行，不做额外 Glob/Grep/Read**
+- task.md 是自包含的（/plan 已把关键代码片段内联进来），**直接读 task.md 本步骤内容执行，不做额外 Glob/Grep/Read**
 - **唯一例外**：该文件已被前步修改，需要读最新状态 → Read 文件获取当前内容
-- 若 `文件` 字段格式为 `path:start-end` → 直接 `Read(path, offset=start, limit=end-start+1)` 精准读取，不全文 Read
 - **信息缺口上报**：若步骤中有无法从 task.md 直接获取的信息（方法名不存在、行号不符、文件找不到）→ 【inline】AskUserQuestion 询问用户 / 【Agent】停止本步骤，上报 NEEDS_CONTEXT
 
 ### 执行改动
@@ -107,14 +106,6 @@ task.md 预期：<预期内容>
 
 ---
 
-## 5. 代码质量约束
-
-1. **遵循项目现有风格**：先 Read 同类文件，再模仿其命名、注释、错误处理风格
-2. **不引入不必要的依赖**：新增 import 前先确认项目是否已有等价工具
-3. **Bash 命令执行前必须说明目的**：不要静默执行可能有副作用的命令
-
----
-
-## 6. 防合理化
+## 5. 防合理化
 
 参见 `<plugin_root>/references/implement-guardrails.md`。
