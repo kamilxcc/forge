@@ -51,14 +51,13 @@ forge-plugin/
 └── skills/
     ├── _inactive/                     # 暂存的 skill（未激活）
     │   └── forge-deposit.SKILL.md     # /deposit：经验飞轮，后续再做
-    ├── forge/                         # 编排层：/go 路由 + /onboard
+    ├── forge/                         # 编排层：/forge 路由
     │   └── SKILL.md                   # task-router、SUBAGENT-GUARD
     ├── forge-clarify/SKILL.md         # /clarify：需求澄清，输出需求文档
     ├── forge-plan/SKILL.md            # /plan：技术方案 + 执行计划
     ├── forge-implement/SKILL.md       # /implement：按计划执行编码
     ├── forge-review/SKILL.md          # /review：代码审查（PASS/WARN/BLOCK）
-    ├── forge-test/SKILL.md            # /test：生成并运行测试
-    └── forge-kb/SKILL.md             # ⚠️ 已废弃：/init-kb + /update-kb（知识库管理）
+    └── forge-test/SKILL.md            # /test：生成并运行测试
 ```
 
 新工作通常是修改 `skills/forge-*/SKILL.md` 或 `scripts/`。共用 pattern 在 `references/` 下修改。
@@ -66,7 +65,7 @@ forge-plugin/
 ## Architecture you must understand before editing
 
 ### 1. Each skill is an independent entry point
-Each `skills/forge-*/SKILL.md` is loaded directly by Claude Code when the user invokes the corresponding command. `skills/forge/SKILL.md` is the orchestrator — it handles `/go` routing and `/onboard` only. When editing a skill, you are editing the complete capability definition — there are no separate agent-prompt files to keep in sync.
+Each `skills/forge-*/SKILL.md` is loaded directly by Claude Code when the user invokes the corresponding command. `skills/forge/SKILL.md` is the orchestrator — it handles `/forge` routing only. When editing a skill, you are editing the complete capability definition — there are no separate agent-prompt files to keep in sync.
 
 ### 2. Two hard invariants
 

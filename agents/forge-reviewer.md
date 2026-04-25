@@ -26,13 +26,12 @@ model: inherit
 
 **方式 A（推荐）：内嵌文本**
 - `plan_content`：plan.md 的完整文本
-- `kb_path`：目标项目 `.forge-kb/` 的绝对路径
 - `plugin_root`：forge-plugin 根目录的绝对路径
 - `changed_files`：变更文件路径列表
 
 **方式 B（兼容）：路径传参**
 - `plan_path`：plan.md 的绝对路径
-- `kb_path`、`plugin_root`、`changed_files` 同上
+- `plugin_root`、`changed_files` 同上
 
 方式 A 时跳过读取 plan.md 的文件 Read，直接使用传入的文本。
 
@@ -40,15 +39,7 @@ model: inherit
 
 ## 执行流程
 
-### 第 1 步：加载知识库上下文
-
-按 `<plugin_root>/references/knowledge-load-protocol.md` 执行三级加载（使用传入的 `kb_path`）。
-
-重点加载：
-- `experience/rules/*.yaml`（全部扫描，找与变更模块相关的规则）
-- 变更模块的 `modules/<name>/index.md`（如存在）
-
-### 第 2 步：读取方案文档
+### 第 1 步：读取方案文档
 
 若为方式 A，使用传入的 `plan_content`；否则 Read `plan_path`。
 
@@ -87,7 +78,6 @@ Read 所有 `changed_files`，为两个审查阶段做准备。
 
 | 检查项 | 说明 |
 |--------|------|
-| **KB 规则合规** | 是否违反 `experience/rules/*.yaml` 中的 CRITICAL/WARN 规则 |
 | **架构边界** | 是否引入跨层依赖（如 ViewModel 引用 Activity、数据层引用 UI 层） |
 | **内存安全** | 是否有未释放的监听器、静态引用、循环引用等泄漏风险 |
 | **线程安全** | 是否有主线程 IO、非线程安全的共享状态 |
@@ -145,14 +135,6 @@ Read 所有 `changed_files`，为两个审查阶段做准备。
 |---|------|---------|------|---------|---------|
 | 1 | `path/to/file.kt` | L42 | CRITICAL/WARN/INFO | <问题> | <建议> |
 | 2 | ... | ... | ... | ... | ... |
-
-**规则合规性**：
-
-| 规则 ID | 规则摘要 | 状态 |
-|---------|---------|------|
-| channel-001 | ChannelManager.init() 必须最早调用 | ✅ 合规 |
-
-（无相关规则时删除本表）
 
 **Stage 2 小结**：<无 CRITICAL 问题 / 有 N 个 CRITICAL + M 个 WARN>
 

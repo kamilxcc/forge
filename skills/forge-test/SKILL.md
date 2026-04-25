@@ -26,20 +26,13 @@ forge-test 负责为本次实现的变更生成测试代码，并执行测试确
 其他输入：
 - 对应的 `work/<project-name>/<dated-slug>/plan.md`（方案文档，用于提取验收条件）
 - 对应的 `work/<project-name>/<dated-slug>/requirement.md`（需求文档，用于验收标准）
-- `.forge-kb/` 知识库上下文
 - 项目现有测试文件（用于匹配测试风格和框架）
 
 ---
 
 ## 执行流程
 
-### 第 1 步：加载知识库上下文
-
-按 `<plugin-root>/references/knowledge-load-protocol.md` 执行 Always-On 层加载。
-
-读取 `meta/project.yaml` 中的 `build.test` 字段，获取测试运行命令。
-
-### 第 2 步：了解项目测试风格
+### 第 1 步：了解项目测试风格
 
 Glob 查找现有测试文件：
 ```
@@ -56,23 +49,9 @@ Read 1-2 个同模块的测试文件，提取：
 
 **优先模仿现有测试风格，不要引入新的测试依赖。**
 
-### 第 2.5 步：-l Flag 检测（按需）
+### 第 2 步：从方案文档提取测试场景
 
-若用户命令包含 `-l` flag（如 `/test -l`）：
-
-1. 运行 `bash <plugin-root>/scripts/list-features.sh --project-name <project-name> --plugin-root <plugin-root>`
-2. 按 `<plugin-root>/references/feature-selector.md` 展示选择器，得到 `active_slug`
-3. 后续所有从 `.current-feature` 读取 `dated-slug` 的地方，**统一替换为 `active_slug`**
-
-若命令不含 `-l`，跳过本步。
-
----
-
-### 第 3 步：从方案文档提取测试场景
-
-获取 `<project-name>`：
-- 优先：读取目标项目 `.forge-kb/meta/project.yaml` 中的 `project.name`
-- 若无法读取（无知识库）：使用当前工作目录的最后一段路径名作为 `<project-name>`
+获取 `<project-name>`：使用当前工作目录的最后一段路径名
 
 再读 `<plugin-root>/work/<project-name>/.current-feature` 获取 `<dated-slug>`，然后 Read `<plugin-root>/work/<project-name>/<dated-slug>/plan.md`，从"实现步骤"和"风险点"节提取测试矩阵：
 
@@ -84,7 +63,7 @@ Read 1-2 个同模块的测试文件，提取：
 
 **MVP 原则**：优先覆盖 P0 场景（正常路径 + 最关键的边界条件）。
 
-### 第 4 步：生成测试文件
+### 第 3 步：生成测试文件
 
 对每个有实质逻辑变更的类，在对应的测试目录下创建/更新测试文件：
 
@@ -112,7 +91,7 @@ class XxxTest {
 }
 ```
 
-### 第 5 步：运行测试
+### 第 4 步：运行测试
 
 ```bash
 <build.test 命令> --tests "<TestClassName>"
@@ -123,7 +102,7 @@ class XxxTest {
 - 若是测试代码本身的问题（mock 设置错误、断言写错），修复测试并重跑
 - 若是被测代码有 bug，**不要修改业务代码**，在报告中说明发现的 bug，建议用户 `/review` 或 `/implement` 修复
 
-### 第 6 步：输出测试报告
+### 第 5 步：输出测试报告
 
 ```markdown
 ## 测试报告
