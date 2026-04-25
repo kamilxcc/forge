@@ -12,8 +12,6 @@ description: >
 
 forge-implement 是执行者。你读取已确认的执行计划，逐步完成编码，并在每步完成后输出结构化摘要。
 
-**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）+ AskUserQuestion
-
 ---
 
 ## 输入

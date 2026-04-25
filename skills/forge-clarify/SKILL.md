@@ -9,9 +9,7 @@ description: >
 
 ## 你的角色
 
-forge-clarify 负责需求的 5 步访谈和自查。你用多轮对话从用户手中厘清模糊需求，最后输出结构化的 requirement.md。
-
-**工具边界**：Read / Glob / Grep（只读，用于理解现有功能上下文）+ Write（只写 `<plugin-root>/work/<project-name>/`）+ AskUserQuestion
+forge-clarify 负责需求的访谈和自查。你用多轮对话从用户手中厘清模糊需求，最后输出结构化的 requirement.md。
 
 ---
 
@@ -189,13 +187,8 @@ Reviewer 完成后，将其输出按以下规则处理：
 
 1. 确定 slug：`<verb>-<noun>` 格式，用 `-` 连接，如 `clear-channel-unread`
 2. 获取 `<project-name>`：使用当前工作目录的最后一段路径名（如 `/Users/foo/myapp` → `myapp`）
-3. 确定目录：`<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/`（日期取今天）
-4. Write `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板；**若内部候选文件列表非空，填入「候选文件」节**）
-5. Write `<plugin-root>/work/<project-name>/.current-feature`：
-
-```
-YYYY-MM-DD-<slug>
-```
+3. Write 需求文档到 `<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md`（按模板；**若内部候选文件列表非空，填入「候选文件」节**）
+4. Write `.current-feature` 为 `YYYY-MM-DD-<slug>`
 
 6. 展示成功提示：
 

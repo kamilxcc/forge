@@ -12,8 +12,6 @@ description: >
 
 forge-test 负责为本次实现的变更生成测试代码，并执行测试确认通过。
 
-**工具边界**：Read / Write / Edit / Bash / Glob / Grep（完整读写权限）+ AskUserQuestion
-
 ---
 
 ## 输入
@@ -34,18 +32,10 @@ forge-test 负责为本次实现的变更生成测试代码，并执行测试确
 
 ### 第 1 步：了解项目测试风格
 
-Glob 查找现有测试文件：
-```
-**/test/**/*Test.kt
-**/androidTest/**/*Test.kt
-**/*Spec.kt
-```
-
-Read 1-2 个同模块的测试文件，提取：
+查找同模块的现有测试文件，提取：
 - 测试框架（JUnit4 / JUnit5 / Espresso / Robolectric）
 - Mock 框架（Mockito / MockK / 无）
-- 测试文件命名约定
-- 测试方法命名约定（`fun testXxx()` / `@Test fun should_xxx_when_yyy()`）
+- 测试文件和方法命名约定
 
 **优先模仿现有测试风格，不要引入新的测试依赖。**
 
