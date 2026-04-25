@@ -7,7 +7,7 @@ dated_slug: <dated-slug>
 plan_doc: plan.md
 requirement_doc: requirement.md   # 模式 B（轻量路径）时改为 inline
 created_at: YYYY-MM-DD
-status: confirmed
+status: draft
 estimated_steps: N
 recommended_mode: inline|agent
 ---

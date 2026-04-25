@@ -344,7 +344,7 @@ Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
   - `label: 确认，开始编码` / `description: 计划无误，直接启动 /implement 开始执行`
   - `label: 需要调整` / `description: 请在 Other 里说明需要修改的地方`
 
-用户选择「确认，开始编码」后，**立即调用 `Skill("forge-implement")`**，无需等待用户再次输入命令。
+用户选择「确认，开始编码」后，**先将 plan.md 和 task.md 的 `status` 字段从 `draft` 改为 `confirmed`**，然后立即调用 `Skill("forge-implement")`，无需等待用户再次输入命令。
 
 ---
 

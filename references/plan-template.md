@@ -5,7 +5,7 @@
 feature: <slug>
 dated_slug: <dated-slug>
 requirement_doc: requirement.md   # 模式 B（轻量路径）时改为 inline
-status: confirmed
+status: draft
 created_at: YYYY-MM-DD
 related_modules: [<module1>, <module2>]
 ---
