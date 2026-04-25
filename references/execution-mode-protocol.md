@@ -29,23 +29,17 @@
 
 ---
 
-## forge-implement 使用方式（Step 3.5 — 运行时选择）
+## forge-implement 使用方式（Step 2.5 — 运行时选择）
 
-读取 task.md 中的 `estimated_steps` 字段（或手动数步骤列表），按上表判断：
+读取 task.md 中的 `recommended_mode` 字段（或手动数步骤列表），**直接按推荐模式执行，不弹 AskUserQuestion**：
 
-- **≤ 3 步**：直接进入 Step 4，在当前 session inline 执行，不弹 AskUserQuestion
-- **> 3 步**：弹出 AskUserQuestion 让用户选择：
+- **≤ 3 步**：直接进入 inline 执行
+- **> 3 步**：派发 forge-executor Agent
 
+执行前输出一行提示说明当前模式：
 ```
-📋 本次计划共 N 步，建议使用 Agent 模式执行（隔离上下文，避免长对话漂移）。
+📋 本次计划共 N 步，执行模式：<inline|Agent>
 ```
-
-AskUserQuestion 参数：
-- `header`：「执行模式」
-- `multiSelect: false`
-- `options`：
-  - `label: Agent 模式（推荐）` / `description: 派发子 Agent 执行，上下文隔离，适合步骤多的任务`
-  - `label: 当前会话执行` / `description: 在本 session 直接执行，上下文连续但可能变长`
 
 ---
 
