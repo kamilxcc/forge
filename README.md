@@ -21,7 +21,7 @@ claude plugin install forge@forge
 ### 更新
 
 ```bash
-claude plugin update forge
+claude plugin update forge@forge
 ```
 
 ---
