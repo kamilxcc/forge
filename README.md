@@ -13,7 +13,7 @@
 claude plugin marketplace add kamilxcc/forge
 
 # 第二步：安装插件
-claude plugin install forge@forge
+claude plugin install forge@forge-hub
 ```
 
 安装后重启 Claude Code 生效。
@@ -21,7 +21,7 @@ claude plugin install forge@forge
 ### 更新
 
 ```bash
-claude plugin update forge@forge
+claude plugin update forge@forge-hub
 ```
 
 ---
