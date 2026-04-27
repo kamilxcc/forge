@@ -197,11 +197,13 @@ Reviewer 完成后，将其输出按以下规则处理：
 5. 展示成功提示：
 
 ```
-✅ 需求文档已保存：work/<project-name>/YYYY-MM-DD-<slug>/requirement.md
+✅ 需求文档已保存：<plugin-root>/work/<project-name>/YYYY-MM-DD-<slug>/requirement.md
 
 下一步可以：
 - /plan <需求描述> — 生成技术方案
 ```
+
+> 展示时将 `<plugin-root>`、`<project-name>`、`YYYY-MM-DD-<slug>` 替换为实际绝对路径，如：`/Users/foo/.claude/plugins/cache/forge/forge/0.1.0/work/myapp/2026-04-27-add-feature/requirement.md`
 
 ---
 

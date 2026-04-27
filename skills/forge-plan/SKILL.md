@@ -233,14 +233,14 @@ Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
 
 ### 第 6 步：展示并等待确认
 
-展示方案文档 + 执行计划摘要（步骤列表）：
+展示方案文档 + 执行计划摘要（步骤列表）。展示时将 `<plugin-root>`、`<project-name>`、`<dated-slug>` 替换为实际绝对路径：
 
 ```
 📋 方案设计完成！
 
-[需求文档] work/<project-name>/<dated-slug>/requirement.md
-[方案文档] work/<project-name>/<dated-slug>/plan.md
-[执行计划] work/<project-name>/<dated-slug>/task.md
+[需求文档] <plugin-root>/work/<project-name>/<dated-slug>/requirement.md
+[方案文档] <plugin-root>/work/<project-name>/<dated-slug>/plan.md
+[执行计划] <plugin-root>/work/<project-name>/<dated-slug>/task.md
 
 **步骤概览**：
 1. <步骤 1>
