@@ -24,6 +24,13 @@ claude plugin install forge@forge-hub
 claude plugin update forge@forge-hub
 ```
 
+### 卸载
+
+```bash
+claude plugin uninstall forge@forge-hub
+claude plugin marketplace remove forge-hub
+```
+
 ---
 
 ## 命令速查
