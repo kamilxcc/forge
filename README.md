@@ -8,10 +8,16 @@
 
 ## 安装
 
-在项目目录下启动 Claude Code 时，通过 `--plugin-dir` 指定本地插件路径：
+```bash
+claude plugin install https://github.com/kamilxcc/forge.git
+```
+
+安装后重启 Claude Code 生效。
+
+### 更新
 
 ```bash
-claude --plugin-dir /path/to/forge-plugin
+claude plugin update forge
 ```
 
 ---
