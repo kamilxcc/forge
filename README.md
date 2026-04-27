@@ -9,7 +9,11 @@
 ## 安装
 
 ```bash
-claude plugin install https://github.com/kamilxcc/forge.git
+# 第一步：添加 marketplace（只需执行一次）
+claude plugin marketplace add kamilxcc/forge
+
+# 第二步：安装插件
+claude plugin install forge@forge
 ```
 
 安装后重启 Claude Code 生效。

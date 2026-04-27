@@ -1,0 +1,17 @@
+{
+  "name": "forge",
+  "owner": {
+    "name": "kamilxiao"
+  },
+  "plugins": [
+    {
+      "name": "forge",
+      "description": "AI 工程化工作流：需求澄清 → 技术方案 → 编码执行 → 代码审查 → 测试",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/kamilxcc/forge.git"
+      },
+      "version": "0.1.0"
+    }
+  ]
+}
