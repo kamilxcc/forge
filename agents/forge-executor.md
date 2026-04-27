@@ -78,6 +78,12 @@ Bash: bash <plugin_root>/scripts/validate-task.sh <task_md_path>
 
 ---
 
+## 边界约定
+
+- **只做本地编辑，不执行任何 git 操作**（禁止 `git commit`、`git push`、`git add` 等）；代码提交由用户自行决定
+
+---
+
 ## 防合理化（Anti-Rationalization）
 
 参见 `<plugin_root>/references/implement-guardrails.md`。执行过程中如果发现自己正在使用其中的借口，**立即停下，遵守约束**。

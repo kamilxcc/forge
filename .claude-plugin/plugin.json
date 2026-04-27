@@ -1,6 +1,6 @@
 {
   "name": "forge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "AI engineering workflow plugin: knowledge-base-driven planning, implementation, review, test, and experience capture for large projects.",
   "author": {
     "name": "kamilxiao"
